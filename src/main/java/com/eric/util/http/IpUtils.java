@@ -1,8 +1,7 @@
 package com.eric.util.http;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
@@ -18,27 +17,23 @@ import java.util.Enumeration;
  * Time:17:36
  * version 1.0.0
  */
+@Slf4j
 public class IpUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(IpUtils.class);
-
     /**
      * 判断当前系统是否是windows系统
+     *
      * @return
      */
     public static boolean isWinOS() {
-        if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-            return true;
-        }
-        return false;
+        return System.getProperty("os.name").toLowerCase().contains("windows");
     }
 
 
     /**
      * 获取本机IP地址
      * 并自动区分Windows还是Linux操作系统
+     *
      * @return
-     * @throws UnknownHostException
-     * @throws SocketException
      */
     public static String getLocalIP() {
         String sIp = "";
@@ -49,26 +44,23 @@ public class IpUtils {
             try {
                 ip = InetAddress.getLocalHost();
             } catch (UnknownHostException e) {
-                LOGGER.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
-
             if (null != ip) {
-                sIp = ip.getHostAddress();
-                ip = null;
-                return sIp;
+                return ip.getHostAddress();
             }
         }
 
         // 如果是Linux操作系统
         boolean bFindIP = false;
-        NetworkInterface network = null;
-        Enumeration<InetAddress> ips = null;
+        NetworkInterface network;
+        Enumeration<InetAddress> ips;
         Enumeration<NetworkInterface> netInterfaces = null;
 
         try {
             netInterfaces = NetworkInterface.getNetworkInterfaces();
         } catch (SocketException e) {
-            LOGGER.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         while (netInterfaces != null && netInterfaces.hasMoreElements()) {
@@ -76,17 +68,16 @@ public class IpUtils {
                 break;
             }
             network = netInterfaces.nextElement();
-            // ----------特定情况，可以考虑用ni.getName判断
             // 遍历所有ip
             ips = network.getInetAddresses();
             while (ips.hasMoreElements()) {
                 ip = ips.nextElement();
 
-                if(ip.isLoopbackAddress()){
+                if (ip.isLoopbackAddress()) {
                     continue;
                 }
 
-                if(ip.getHostAddress().contains(":")){
+                if (ip.getHostAddress().contains(":")) {
                     continue;
                 }
 
@@ -102,16 +93,12 @@ public class IpUtils {
             sIp = ip.getHostAddress();
         }
 
-        ip = null;
-        ips = null;
-        network = null;
-        netInterfaces = null;
-
         return sIp;
     }
 
     /**
      * 获取客户端请求的IP地址
+     *
      * @param request
      * @return
      */

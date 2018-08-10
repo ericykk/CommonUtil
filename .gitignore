@@ -4,7 +4,7 @@ CommonUtil.iml
 .idea
 # Compiled class file
 *.class
-
+com.eric.util.iml
 # Log file
 *.log
 
